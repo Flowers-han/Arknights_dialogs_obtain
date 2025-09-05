@@ -1,26 +1,35 @@
 import requests
-from bs4 import BeautifulSoup
 
-def fetch_titles():
-    url = "https://prts.wiki/w/%E5%89%A7%E6%83%85%E4%B8%80%E8%A7%88"
-    response = requests.get(url)
-    response.encoding = "utf-8"
-    soup = BeautifulSoup(response.text, "html.parser")
+def get_story_titles():
+    url = "https://prts.wiki/api.php"
+    params = {
+        "action": "query",
+        "format": "json",
+        "list": "categorymembers",
+        "cmtitle": "Category:剧情",
+        "cmlimit": "max"
+    }
 
     titles = []
-    for link in soup.find_all("a", href=True, title=True):
-        title = link["title"]
-        # 只要是剧情页（排除目录/锚点/文件等）
-        if not title.startswith("File:") and not title.startswith("Special:"):
-            titles.append(title)
+    while True:
+        r = requests.get(url, params=params).json()
+        pages = r["query"]["categorymembers"]
+        titles.extend([p["title"] for p in pages])
 
-    titles = sorted(set(titles))
+        # 翻页
+        if "continue" in r:
+            params.update(r["continue"])
+        else:
+            break
+
     return titles
 
 
 if __name__ == "__main__":
-    titles = fetch_titles()
-    with open("剧情章节标题.txt", "w", encoding="utf-8") as f:
-        for t in titles:
+    stories = get_story_titles()
+    print(f"共获取 {len(stories)} 个剧情页面")
+    for t in stories[:20]:  # 先看前20个
+        print(t)
+    with open("剧情标题.txt", "w", encoding="utf-8") as f:
+        for t in stories:
             f.write(t + "\n")
-    print(f"共获取 {len(titles)} 个标题，已保存到 剧情章节标题.txt")

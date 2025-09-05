@@ -1,2 +1,7 @@
+.gitignore
 /txts/
 /mds/
+/titles/
+/ops/
+上传至LangBot知识库.py
+/__pycache__/

@@ -23,9 +23,9 @@ def fetch_wiki_text(title: str):
     return produced_text
 
 def save_dialogs_to_file(dialogs, title):
-    os.makedirs("txts", exist_ok=True)
+    os.makedirs("titles", exist_ok=True)
     safe_title = re.sub(r'[\\/*?:"<>|]', "_", title)
-    filename = os.path.join("txts", f"{safe_title}.txt")
+    filename = os.path.join("titles", f"{safe_title}.txt")
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(f"# {title}\n\n")
